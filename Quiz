@@ -1,0 +1,79 @@
+# Global variable for the token
+import sys
+token = None
+
+# Function to handle errors
+def error():
+    sys.stderr.write("Error\n")
+    sys.exit(1)
+
+# Function to match the current token with the expected token
+def match(expectedToken):
+    global token
+    if token == expectedToken:
+        token = next_char()
+    else:
+        error()
+
+# Function to parse and evaluate an expression
+def expr():
+    global token
+    temp = term()
+    while token == '+' or token == '-':
+        if token == '+':
+            match('+')
+            temp += term()
+        elif token == '-':
+            match('-')
+            temp -= term()
+    return temp
+
+# Function to parse and evaluate a term
+def term():
+    global token
+    temp = factor()
+    while token == '*':
+        match('*')
+        temp *= factor()
+    return temp
+
+# Function to parse and evaluate a factor
+def factor():
+    global token
+    temp = None
+    while token.isspace():  # Skip and ignore whitespace characters
+        token = next_char()
+    if token == '(':
+        match('(')
+        temp = expr()
+        match(')')
+    elif token.isdigit():
+        temp = int(token)
+        token = next_char()
+    else:
+        error()
+    return temp
+
+# Function to read the next character from user input
+def next_char():
+    char = input()
+    while char.isspace():  # Skip and ignore whitespace characters
+        char = input()
+    return char
+
+# Main function to load the lookahead and call the expression
+def main():
+    global token
+    print("A RECURSIVE-DESCENT CALCULATOR.")
+    print("\t the valid operations are +, - and *")
+    print("Enter the calculation string, e.g. '34+6*56'")
+    token = next_char()  # Load the token with the first character for lookahead
+
+    result = expr()
+    if token == '\n':  # Check for the end of the line
+        print("Result =", result)
+    else:
+        error()  # Extraneous characters on the line
+
+if __name__ == "__main__":
+    main()
